@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>techresources.se — Cloud & Infrastructure Consulting</title>
+<meta name="description" content="Cloud consulting, Kubernetes, Azure, on-prem infrastructure, and GitOps expertise.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⬡</text></svg>">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap');
+
+  :root {
+    --bg: #0a0e14;
+    --fg: #b3b1ad;
+    --cyan: #39bae6;
+    --green: #7fd962;
+    --orange: #ff8f40;
+    --magenta: #d2a6ff;
+    --red: #f07178;
+    --yellow: #e6b450;
+    --dim: #4a5568;
+    --border: #1a1f2e;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html {
+    scrollbar-color: var(--border) var(--bg);
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', monospace;
+    font-size: 14px;
+    line-height: 1.7;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  .scanline {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    z-index: 999;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.03) 2px,
+      rgba(0, 0, 0, 0.03) 4px
+    );
+  }
+
+  .container {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+  }
+
+  .terminal-window {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+    background: rgba(10, 14, 20, 0.8);
+  }
+
+  .terminal-bar {
+    background: var(--border);
+    padding: 8px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .terminal-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+  }
+  .terminal-dot.red { background: #f07178; }
+  .terminal-dot.yellow { background: #e6b450; }
+  .terminal-dot.green { background: #7fd962; }
+
+  .terminal-title {
+    color: var(--dim);
+    font-size: 11px;
+    margin-left: 8px;
+  }
+
+  .terminal-body {
+    padding: 1.5rem;
+  }
+
+  .ascii-logo {
+    color: var(--cyan);
+    font-size: 11px;
+    line-height: 1.3;
+    white-space: pre;
+    overflow-x: auto;
+  }
+
+  @media (max-width: 600px) {
+    .ascii-logo {
+      font-size: 7px;
+    }
+  }
+
+  .prompt { color: var(--green); }
+  .cmd { color: var(--fg); }
+  .flag { color: var(--orange); }
+  .val { color: var(--cyan); }
+  .comment { color: var(--dim); font-style: italic; }
+  .string { color: var(--green); }
+  .key { color: var(--magenta); }
+  .heading { color: var(--yellow); }
+  .err { color: var(--red); }
+
+  .cursor {
+    display: inline-block;
+    width: 8px;
+    height: 16px;
+    background: var(--green);
+    animation: blink 1s step-end infinite;
+    vertical-align: text-bottom;
+    margin-left: 2px;
+  }
+
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
+
+  .output-block {
+    margin: 1rem 0;
+    padding-left: 1rem;
+    border-left: 2px solid var(--border);
+  }
+
+  .section-label {
+    color: var(--yellow);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .skill-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0;
+  }
+
+  .skill-item {
+    padding: 4px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .skill-item::before {
+    content: '├──';
+    color: var(--dim);
+    font-size: 12px;
+  }
+
+  .skill-item:last-child::before {
+    content: '└──';
+  }
+
+  .tree-section {
+    margin: 1.5rem 0;
+  }
+
+  .tree-header {
+    color: var(--cyan);
+    margin-bottom: 0.5rem;
+  }
+
+  .tree-line {
+    padding: 2px 0;
+    color: var(--fg);
+  }
+
+  .tree-connector { color: var(--dim); }
+
+  a {
+    color: var(--cyan);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--cyan);
+    transition: color 0.2s, border-color 0.2s;
+  }
+
+  a:hover {
+    color: var(--green);
+    border-color: var(--green);
+  }
+
+  .service-card {
+    border: 1px solid var(--border);
+    padding: 1rem 1.25rem;
+    margin: 0.75rem 0;
+    border-radius: 4px;
+    transition: border-color 0.3s;
+  }
+
+  .service-card:hover {
+    border-color: var(--cyan);
+  }
+
+  .service-title {
+    color: var(--cyan);
+    font-weight: 500;
+    margin-bottom: 0.4rem;
+  }
+
+  .service-desc {
+    color: var(--dim);
+    font-size: 12px;
+  }
+
+  .divider {
+    border: none;
+    border-top: 1px dashed var(--border);
+    margin: 2rem 0;
+  }
+
+  .footer {
+    text-align: center;
+    color: var(--dim);
+    font-size: 11px;
+    padding: 2rem 0 1rem;
+  }
+
+  .footer a {
+    color: var(--dim);
+    border-bottom-color: var(--dim);
+  }
+
+  .status-line {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 6px 14px;
+    background: var(--border);
+    font-size: 11px;
+    color: var(--dim);
+    border-top: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .status-item { display: flex; align-items: center; gap: 6px; }
+  .status-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* Typing animation for hero */
+  .typed-line {
+    overflow: hidden;
+    white-space: nowrap;
+    opacity: 0;
+    animation: fadeIn 0.3s forwards;
+  }
+  .typed-line:nth-child(1) { animation-delay: 0.2s; }
+  .typed-line:nth-child(2) { animation-delay: 0.6s; }
+  .typed-line:nth-child(3) { animation-delay: 1.0s; }
+  .typed-line:nth-child(4) { animation-delay: 1.4s; }
+  .typed-line:nth-child(5) { animation-delay: 1.8s; }
+  .typed-line:nth-child(6) { animation-delay: 2.2s; }
+  .typed-line:nth-child(7) { animation-delay: 2.6s; }
+
+  @keyframes fadeIn {
+    to { opacity: 1; }
+  }
+
+  .fade-section {
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  .fade-section.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .contact-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-top: 1rem;
+  }
+
+  .contact-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    font-size: 11px;
+    color: var(--dim);
+    margin: 2px;
+    transition: color 0.2s, border-color 0.2s;
+  }
+
+  .tag:hover {
+    color: var(--cyan);
+    border-color: var(--cyan);
+  }
+
+  .email-reveal {
+    background: none;
+    border: 1px dashed var(--dim);
+    border-radius: 3px;
+    color: var(--cyan);
+    font-family: inherit;
+    font-size: inherit;
+    padding: 1px 8px;
+    cursor: pointer;
+    transition: border-color 0.3s, color 0.3s;
+  }
+  .email-reveal:hover {
+    border-color: var(--cyan);
+    color: var(--green);
+  }
+  .email-revealed {
+    animation: revealFlash 0.4s ease;
+  }
+  @keyframes revealFlash {
+    0%   { opacity: 0; transform: translateY(-2px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Nav bar */
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10, 14, 20, 0.92);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    padding: 0;
+  }
+
+  .nav-inner {
+    max-width: 820px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .nav-inner::-webkit-scrollbar { display: none; }
+
+  .nav-link {
+    color: var(--dim);
+    text-decoration: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 10px 16px;
+    font-size: 11px;
+    font-family: inherit;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    transition: color 0.2s, border-color 0.2s;
+  }
+
+  .nav-link:hover {
+    color: var(--cyan);
+    border-bottom-color: var(--cyan);
+  }
+
+  .nav-link.active {
+    color: var(--green);
+    border-bottom-color: var(--green);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 50px;
+  }
+</style>
+</head>
+<body>
+
+<div class="scanline"></div>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="#top" class="nav-link">~/</a>
+    <a href="#services" class="nav-link">services</a>
+    <a href="#stack" class="nav-link">stack</a>
+    <a href="#approach" class="nav-link">approach</a>
+    <a href="#contact" class="nav-link">contact</a>
+  </div>
+</nav>
+
+<div class="container">
+
+  <!-- HEADER / LOGO -->
+  <div id="top" class="terminal-window">
+    <div class="terminal-bar">
+      <div class="terminal-dot red"></div>
+      <div class="terminal-dot yellow"></div>
+      <div class="terminal-dot green"></div>
+      <span class="terminal-title">techresources.se — zsh</span>
+    </div>
+    <div class="terminal-body">
+      <div class="ascii-logo">
+  ▀█▀ █▀▀ █▀▀ █ █ █▀█ █▀▀ █▀ █▀█ █ █ █▀█ █▀▀ █▀▀ █▀
+   █  ██▄ █▄▄ █▀█ █▀▄ ██▄ ▄█ █▄█ █▄█ █▀▄ █▄▄ ██▄ ▄█
+                        <span style="color: var(--dim)">.se</span>
+
+  ─────────────────────────────────────────────────────
+  <span style="color: var(--dim)">Cloud &amp; Infrastructure Consulting</span>
+</div>
+      <br>
+      <div class="typed-line"><span class="prompt">❯</span> <span class="cmd">whoami</span></div>
+      <div class="typed-line"><span class="comment">  # Cloud consultant &amp; infrastructure engineer</span></div>
+      <div class="typed-line"><span class="comment">  # Designing, deploying &amp; managing production systems</span></div>
+      <div class="typed-line"><span class="comment">  # From bare metal → hypervisor → container → cloud</span></div>
+      <div class="typed-line"><span class="comment">  # Emphasis on DevX, Security &amp; FinOps</span></div>
+      <div class="typed-line"><br><span class="prompt">❯</span> <span class="cmd">cat</span> <span class="flag">/etc/motd</span></div>
+      <div class="typed-line"><span style="color: var(--green);">  Systems should be automated, observable, and boring.</span><span class="cursor"></span></div>
+    </div>
+  </div>
+
+  <!-- SERVICES -->
+  <div id="services" class="terminal-window fade-section">
+    <div class="terminal-bar">
+      <div class="terminal-dot red"></div>
+      <div class="terminal-dot yellow"></div>
+      <div class="terminal-dot green"></div>
+      <span class="terminal-title">services.yml</span>
+    </div>
+    <div class="terminal-body">
+      <div class="section-label">─── What I Do ───</div>
+
+      <div><span class="prompt">❯</span> <span class="cmd">kubectl get services</span> <span class="flag">-o wide</span></div>
+      <br>
+
+      <div class="service-card">
+        <div class="service-title">☁  Cloud Architecture &amp; Migration</div>
+        <div class="service-desc">
+          Azure landing zones, AKS clusters, networking (VNets, peering,<br>
+          , identity &amp; RBAC, cost optimization, IaC with<br>
+          Terraform.
+        </div>
+      </div>
+
+      <div class="service-card">
+        <div class="service-title">⎈  Kubernetes &amp; Container Platforms</div>
+        <div class="service-desc">
+          Production-grade K8s on AKS and bare metal with Talos Linux.<br>
+          Cluster lifecycle, multi-tenancy, network policies, ingress,<br>
+          service mesh, and storage orchestration.
+        </div>
+      </div>
+
+      <div class="service-card">
+        <div class="service-title">⚙  On-Prem &amp; Bare Metal Infrastructure</div>
+        <div class="service-desc">
+          Rook-Ceph distributed storage, Redfish/iDRAC automation,<br>
+          PXE boot, Talos machine configs, BGP/VXLAN networking,<br>
+          Multus multi-network, KubeVirt VM workloads,<br>
+          hardware lifecycle management.
+        </div>
+      </div>
+
+      <div class="service-card">
+        <div class="service-title">🔄  GitOps &amp; Delivery Pipelines</div>
+        <div class="service-desc">
+          ArgoCD &amp; Flux continuous delivery, Helm chart management,<br>
+          Kustomize overlays, progressive rollouts, image automation,<br>
+          multi-cluster sync strategies.
+        </div>
+      </div>
+
+      <div class="service-card">
+        <div class="service-title">�  Networking &amp; Service Mesh</div>
+        <div class="service-desc">
+          Cilium eBPF-based networking, Envoy proxy &amp; ingress,<br>
+          Hubble observability for network flows, Network Policies,<br>
+          L4/L7 traffic control, mTLS, and multi-cluster connectivity.
+        </div>
+      </div>
+
+      <div class="service-card">        <div class="service-title">🔷  Data Platforms &amp; Analytics</div>
+        <div class="service-desc">
+          Databricks workspaces &amp; Unity Catalog, Spark jobs &amp; optimization,<br>
+          Delta Lake, SQL warehouses, lakehouse architecture on Azure.<br>
+          Kafka streaming, Flink real-time processing.<br>
+          Workflow orchestration with Databricks Workflows, Argo Workflows,<br>
+          Dagster, and Airflow.
+        </div>
+      </div>
+
+      <div class="service-card">        <div class="service-title">�📡  Observability &amp; Reliability</div>
+        <div class="service-desc">
+          Prometheus/Grafana/Loki/Tempo stacks, Grafana Cloud,<br>
+          OpenTelemetry (OTEL) instrumentation, alerting pipelines,<br>
+          SLO-driven monitoring, incident response automation,<br>
+          capacity planning.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TECH STACK -->
+  <div id="stack" class="terminal-window fade-section">
+    <div class="terminal-bar">
+      <div class="terminal-dot red"></div>
+      <div class="terminal-dot yellow"></div>
+      <div class="terminal-dot green"></div>
+      <span class="terminal-title">stack.tree</span>
+    </div>
+    <div class="terminal-body">
+      <div class="section-label">─── Tech Stack ───</div>
+
+      <div><span class="prompt">❯</span> <span class="cmd">tree</span> <span class="flag">--dirsfirst</span> <span class="val">./toolbox</span></div>
+      <br>
+      <pre style="line-height: 1.6;"><span class="val">./toolbox</span>
+<span class="tree-connector">├──</span> <span class="key">cloud/</span>
+<span class="tree-connector">│   ├──</span> <span class="tag">Azure</span> <span class="tag">AKS</span> <span class="tag">Entra ID</span>
+<span class="tree-connector">│   └──</span> <span class="tag">Terraform</span> <span class="tag">ASO</span> <span class="tag">KRO</span>
+<span class="tree-connector">├──</span> <span class="key">kubernetes/</span>
+<span class="tree-connector">│   ├──</span> <span class="tag">Talos Linux</span>
+<span class="tree-connector">│   ├──</span> <span class="tag">Helm</span> <span class="tag">Kustomize</span> <span class="tag">Operator SDK</span>
+<span class="tree-connector">│   └──</span> <span class="tag">Cilium</span> <span class="tag">Calico</span> <span class="tag">MetalLB</span>
+<span class="tree-connector">├──</span> <span class="key">storage/</span>
+<span class="tree-connector">│   └──</span> <span class="tag">Rook-Ceph</span>
+<span class="tree-connector">├──</span> <span class="key">gitops/</span>
+<span class="tree-connector">│   └──</span> <span class="tag">ArgoCD</span> <span class="tag">Flux</span> <span class="tag">GitHub Actions</span>
+<span class="tree-connector">├──</span> <span class="key">bare-metal/</span>
+<span class="tree-connector">│   ├──</span> <span class="tag">Redfish</span> <span class="tag">iDRAC</span> <span class="tag">PXE</span> <span class="tag">Matchbox</span> <span class="tag">dnsmasq</span>
+<span class="tree-connector">│   └──</span> <span class="tag">Nomad</span> <span class="tag">Consul</span> <span class="tag">Vault</span>
+<span class="tree-connector">├──</span> <span class="key">data-platform/</span>
+<span class="tree-connector">│   ├──</span> <span class="tag">Databricks</span> <span class="tag">Spark</span> <span class="tag">Delta Lake</span>
+<span class="tree-connector">│   ├──</span> <span class="tag">Kafka</span> <span class="tag">Flink</span> <span class="tag">SQL</span> <span class="tag">Unity Catalog</span>
+<span class="tree-connector">│   └──</span> <span class="tag">Argo Workflows</span> <span class="tag">Dagster</span> <span class="tag">Airflow</span>
+<span class="tree-connector">├──</span> <span class="key">observability/</span>
+<span class="tree-connector">│   ├──</span> <span class="tag">Prometheus</span> <span class="tag">Grafana</span> <span class="tag">Loki</span> <span class="tag">Tempo</span>
+<span class="tree-connector">│   └──</span> <span class="tag">Grafana Cloud</span> <span class="tag">OpenTelemetry</span>
+<span class="tree-connector">└──</span> <span class="key">networking/</span>
+    <span class="tree-connector">└──</span> <span class="tag">BGP</span> <span class="tag">VXLAN</span> <span class="tag">WireGuard</span></pre>
+    </div>
+  </div>
+
+  <!-- APPROACH -->
+  <div id="approach" class="terminal-window fade-section">
+    <div class="terminal-bar">
+      <div class="terminal-dot red"></div>
+      <div class="terminal-dot yellow"></div>
+      <div class="terminal-dot green"></div>
+      <span class="terminal-title">approach.sh</span>
+    </div>
+    <div class="terminal-body">
+      <div class="section-label">─── How I Work ───</div>
+      <pre style="line-height: 1.8;">
+<span class="comment">#!/bin/bash</span>
+<span class="comment"># Every engagement follows the same loop:</span>
+
+<span class="key">assess</span>() {
+  <span class="comment"># Audit existing infra, gaps, and goals</span>
+  echo <span class="string">"Understand before you automate"</span>
+}
+
+<span class="key">design</span>() {
+  <span class="comment"># Architecture decisions, diagrams, trade-offs</span>
+  echo <span class="string">"Simple &gt; clever, boring &gt; exciting"</span>
+}
+
+<span class="key">implement</span>() {
+  <span class="comment"># IaC, GitOps, CI/CD — everything as code</span>
+  echo <span class="string">"If it's not in git, it doesn't exist"</span>
+}
+
+<span class="key">handover</span>() {
+  <span class="comment"># Documentation, runbooks, knowledge transfer</span>
+  echo <span class="string">"Your team owns it, not me"</span>
+}
+
+<span class="val">assess</span> | <span class="val">design</span> | <span class="val">implement</span> | <span class="val">handover</span></pre>
+    </div>
+  </div>
+
+  <!-- CONTACT -->
+  <div id="contact" class="terminal-window fade-section">
+    <div class="terminal-bar">
+      <div class="terminal-dot red"></div>
+      <div class="terminal-dot yellow"></div>
+      <div class="terminal-dot green"></div>
+      <span class="terminal-title">contact.conf</span>
+    </div>
+    <div class="terminal-body">
+      <div class="section-label">─── Get In Touch ───</div>
+
+      <div><span class="prompt">❯</span> <span class="cmd">cat</span> <span class="flag">~/.config/contact.conf</span></div>
+      <br>
+      <pre style="line-height: 2;">
+<span class="dim">[</span><span class="key">contact</span><span class="dim">]</span>
+<span class="flag">email</span>    = <button class="email-reveal" id="emailReveal" onclick="revealEmail()" title="Click to decrypt">[ ▶ decrypt email ]</button>
+<span class="flag">web</span>      = <a href="https://www.techresources.se">https://www.techresources.se</a>
+<span class="flag">github</span>   = <a href="https://github.com/techresources-se" target="_blank" rel="noopener">github.com/techresources-se</a>
+    </div>
+    <div class="status-line">
+      <div class="status-item">
+        <div class="status-dot"></div>
+        Available for projects
+      </div>
+      <div class="status-item">
+        Skane, Sweden 🇸🇪
+        Sweden, SE 🇸🇪
+        Copenhagen, DK 🇩🇰
+        Remote 🌐
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span class="dim">───────────────────────────────</span><br><br>
+    © 2026 techresources.se<br>
+    <span class="dim">Built with nothing but HTML &amp; CSS. No frameworks were harmed.</span>
+  </div>
+
+</div>
+
+<script>
+// Intersection Observer for fade-in sections
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.fade-section').forEach(el => observer.observe(el));
+
+// Highlight active nav link on scroll
+const sections = document.querySelectorAll('[id]');
+const navLinks = document.querySelectorAll('.nav-link');
+
+const navObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      navLinks.forEach(link => {
+        link.classList.toggle('active',
+          link.getAttribute('href') === '#' + entry.target.id);
+      });
+    }
+  });
+}, { threshold: 0.3, rootMargin: '-50px 0px -50% 0px' });
+
+sections.forEach(s => navObserver.observe(s));
+
+// Email obfuscation — assembled at runtime on user click
+function revealEmail() {
+  const p = ['h','e','l','l','o'];
+  const d = ['t','e','c','h','r','e','s','o','u','r','c','e','s','.','s','e'];
+  const addr = p.join('') + String.fromCharCode(64) + d.join('');
+  const btn = document.getElementById('emailReveal');
+  const link = document.createElement('a');
+  link.href = 'mai' + 'lto:' + addr;
+  link.textContent = addr;
+  link.classList.add('email-revealed');
+  btn.replaceWith(link);
+}
+</script>
+
+</body>
+</html>
